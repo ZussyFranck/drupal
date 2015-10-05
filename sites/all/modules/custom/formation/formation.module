@@ -1,0 +1,336 @@
+<?php
+// definition du module
+// fonction qui gère le contenu dans la partie aide du module
+function formation_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#formation':
+      return '<p>' .t('Hello'). '</p>';
+  }
+}
+//////////////////////
+
+// fonction permettant de gérer le texte dans les droits du module
+function formation_permission() {
+  return array(
+    'administer my module' => array(
+      'title' => t('training'),
+      'description' => t('how are you'),
+    ),
+  );
+}
+///////////////////
+///////////////////
+
+
+//function module_load_include('inc', 'formation', 'includes/settings_module.inc');
+
+
+
+/*//fonction qui affiche qqch à la connexion
+function formation_user_login(&$edit, $account) {
+	if (user_is_logged_in()) {
+		drupal_set_message(t('Hello').' '.$account->name, "error");
+	}
+}
+///////////////////////////*/
+
+
+
+
+// fonction qui permet de créer un block
+function formation_block_info() {
+  $blocks['test'] = array(
+    'info' => t('Bloc de test'),
+    'status' => TRUE,
+    'region' => 'content'
+  );
+  return $blocks;
+}
+//////////////////////
+
+// permet de modifier le contenu de ce block
+function formation_block_view($delta = '') {
+  $block = array();
+  switch ($delta) {
+    case 'test':
+    $block['content'] = t('Welcome to our website, it is %date', array('%date' => date("H\hi")));
+    break;
+  }
+  return $block;
+}
+/////////////////
+
+//déclarer un formulaire
+function calculatrice($form, &$form_state){
+  $form = array();
+
+  $form['first_value'] = array(
+    '#type' => 'textfield',
+    '#title' => t('First value'),
+    '#weight' => 0,
+    '#description' => 'Enter first numeric value',
+  );
+
+  $form['operators'] = array(
+    '#title' => t('Operators'),
+    '#options' => array('Plus'=>t('Plus'),'Minus'=>t('Minus'),'Multiply'=>t('Multiply'),'Divide'=>t('Divide')),
+    '#weight' => 1,
+    '#type' => isset($form_state['values']['radio_choice'])?$form_state['values']['radio_choice']:'radios', //si value radiochoice est set alors on met values radiochoice en type sinon par défaut on met radios
+    '#prefix' =>'<div id="operators_wrapper">',
+    '#suffix' =>'</div>',
+  );
+
+  $form['second_value'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Second value'),
+    '#weight' => 2,
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Calculate'),
+    '#weight' => 3,
+  );
+
+  $form['radio_choice'] = array(
+    '#type' => 'radios',
+    '#title' => t('Choice'),
+    '#options' => array('select'=>t('list'),'radios'=>t('button')),
+    '#weight' => 4,
+    '#ajax' => array(
+      'callback' => 'choice_ajax',
+      'wrapper' => 'operators_wrapper'
+    )
+  );
+
+  return $form;
+}
+//////////
+
+//fonction appel ajax
+function choice_ajax($form, &$form_state){
+  return $form['operators'];
+}
+////////
+
+// ajoute lien au menu 'navigation' => structure -> menu -> navigation
+// hook_menu permet de créer une page == $items['formation'] par exemple avec l'url formation ici. Puis == 'page callback' => 'formation_content' permet de créer function formation_content qui défii ce qu'il ya dans cette nouvelle page
+function formation_menu(){
+	$items['formation'] = array(
+		'title'	=> 'Formation',
+		'page callback' => 'formation_content',
+		'access callback' => TRUE,
+		);
+
+    $items['calculatrice'] = array(
+    'title' => 'Calculatrice',
+    'page callback' => 'formation_calculatrice',
+    'access callback' => TRUE,
+    );
+
+    $items['admin/appearance/block_color'] = array(
+    'title' => 'Color choices',
+    'page callback' => 'colorblock',
+    'access callback' => TRUE,
+    );//met automatiquement nouvelle page dans le menu admin
+
+	return $items;
+}
+/////////////////////
+
+// permet d'ajouter du contenu quand on arrive sur cette page 'formation'
+function formation_content(){
+	global $user; // permet d'utiliser la variable user
+	return '<p>'.t('You are on the page :').' '.drupal_get_title().'<br>'.t('Your username is').' '.$user->name.'</p>';
+}
+/////////////////////
+
+// créer formulaire dans page colorblock
+function colorblock(){
+  return drupal_get_form('color_form');
+}
+/////////////////////
+
+function colorblock_preprocess_block(&$variables){
+  $block = $variables['block'];
+  if ($block->region == 'secondary') {
+    $variables['classes_array'][] = variable_get('color_choice');
+  }
+}
+
+//form de la page colorblock
+function color_form($form, &$form_state){
+  $form = array();
+
+  $form['color_choice'] = array(
+    '#title' => t('color_choice'),
+    '#options' => array('green'=>t('Green'),'red'=>t('Red'),'purple'=>t('Purple'),'orange'=>t('Orange')),
+    '#weight' => 1,
+    '#type' => 'select',
+  );
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+    '#weight' => 3,
+  );
+  return $form;
+}
+///
+
+// permet de chercher le formulaire pour l'afficher 
+function formation_calculatrice(){
+  return drupal_get_form('calculatrice');
+}
+
+//permet de gérer la validation des formulaire //fonction de validation appelée par défaut
+function calculatrice_validate($form, &$form_state){
+  if(!is_numeric($form_state['values']['first_value'])){
+    form_set_error('first_value', t('First value must be numeric'));
+  }
+
+  if(!is_numeric($form_state['values']['second_value'])){
+    form_set_error('second_value', t('Second value must be numeric'));
+  }  
+
+  if($form_state['values']['operators']=='Divide'&&($form_state['values']['second_value']==0)){
+    form_set_error('second_value', t('Second value must be different'));
+  }
+}
+///////////////
+
+// ce qui est affiché à l'envoi du form quand la validation passe
+function calculatrice_submit($form, &$form_state) {
+  if($form_state['values']['operators']=='Plus'){ //form_state pour selectionner les valeurs du formulaire
+    $result = $form_state['values']['first_value'] + $form_state['values']['second_value'];
+  }
+  if($form_state['values']['operators']=='Minus'){
+    $result = $form_state['values']['first_value'] - $form_state['values']['second_value'];
+  }
+  if($form_state['values']['operators']=='Divide'){
+    $result = $form_state['values']['first_value'] / $form_state['values']['second_value'];
+  }
+  if($form_state['values']['operators']=='Multiply'){
+    $result = $form_state['values']['first_value'] * $form_state['values']['second_value'];
+  }
+  drupal_set_message ($result);
+}
+//////
+
+// modifier formulaire de contact drupalcore
+function formation_form_alter(&$form, &$form_state, $form_id) { // le petit '&'$form permet de modifier directement l'objet sans faire de return
+    if($form_id=='contact_site_form') //id formulaire
+    {
+      unset($form['subject']); 
+
+      $form['phone'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Phone'),
+      '#weight' => 3,
+      '#required' => 1,
+      );
+
+      $form['actions']['submit']['#value'] = t('send message now');
+
+      //ordre d'affichage des champs
+      $form['name']['#weight'] = 0;
+      $form['mail']['#weight'] = 1;
+      $form['message']['#weight'] = 2;
+      $form['copy']['#weight'] = 4;
+      $form['submit']['#weight'] = 2;
+
+      //dpm($form['phone'], $name = NULL, $type = 'status');  // permet d'afficher les informations sur le champ phone de $form
+    }
+}
+/////////////////////
+
+
+
+
+/*
+  function formation_block_info() {
+    $blocks['formation'] = array(
+      'info' => t('Formation'),
+      'cache' => DRUPAL_NO_CACHE,
+      'status' => TRUE,
+      'region' => 'Secondary'
+    );
+
+    $blocks['count_query'] = array(
+      'info' => t('Count'),
+      'cache' => DRUPAL_NO_CACHE,
+      'status' => TRUE,
+      'region' => 'Secondary'
+    );
+
+    $blocks['stats'] = array(
+      'info' => t('Statistics'),
+      'cache' => DRUPAL_NO_CACHE,
+      'status' => TRUE,
+      'region' => 'Secondary'
+    );
+    return $blocks;
+  }
+
+
+function formation_block_view($delta = '') {
+
+  $block = array();
+  switch ($delta) {
+    case 'formation':
+      $block['subject'] = t('Formation');
+      $block['content'] = t('Welcome to our website, it is %date', array('%date' => date("H\hi")));
+      break;
+
+    case 'stats':
+      $query = db_select('formation_count', 'f')
+        ->fields('f', array('counter'));
+
+      $query->addExpression('SUM(counter)', 'view_total');
+
+      $result = $query->execute();
+      $record = $result->fetch();  
+
+      $block['subject'] = t('Statistics');
+      $block['content'] = t('The sum of the page visits is %record', array('%record' => $record->view_total));
+      break;
+
+    case 'count_query':
+        $querytwo = db_select('formation_count', 'f')
+        ->fields('f', array('counter'));
+
+        $querytwo->addExpression('SUM(counter)', 'view_total');
+
+        $resulttwo = $querytwo->execute();
+        $recordtwo = $resulttwo->fetch();  
+
+        $query = db_select('node', 'n')
+          ->fields('n', array('type'))
+          ->groupBy('type');
+        $query->addExpression('COUNT(1)', 'total');
+        $result = $query->execute();
+
+        foreach ($result as $record) {
+          $data[] = array(
+            'type' => ucfirst($record->type),
+            'total' => $record->total,
+          );
+        }
+
+        $data[] = array(
+            'type' => t('Views total'),
+            'total' => $recordtwo->view_total,
+          );
+
+        $variables = array(
+          'header' => array(t('Type'), t('Total'),),
+          'rows' => $data,
+        );
+
+      $block['subject'] = t('Count');
+      $block['content'] = theme('table', $variables);
+      break;
+  }
+  return $block;
+}
+*/

@@ -1,0 +1,13 @@
+name = formation
+
+description = permier module d'entrainement
+
+version = 7.x
+
+core = 7.x
+
+package = DWEB
+
+; script[] = js/main.js
+
+stylesheets[all][] = css/main.css
