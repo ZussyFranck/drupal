@@ -68,7 +68,6 @@
 <div id="wrap">
 
   <header id="header" class="clearfix" role="banner">
-
     <div>
       <?php if ($logo): ?>
        <div id="logo">
@@ -93,7 +92,9 @@
       </div>
     </nav><!-- end main-menu -->
   </header>
+</div>
   
+  <div id="wrap">
   <?php print render($page['header']); ?>
 
   <?php print render($page['secondary_content']); ?>
@@ -139,7 +140,9 @@
     </div>
     <div class="clear"></div>
   <?php endif; ?>
+  </div>
   
+  <div id="wrap">
   <!--END footer -->
   <?php print render($page['footer']) ?>
 

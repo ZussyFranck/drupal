@@ -1,0 +1,15 @@
+name = Expect The Best
+
+description = Add and update movie's informations on your website
+
+version = 7.x
+
+core = 7.x
+
+package = API
+
+configure = admin/config/content/api
+
+; script[] = js/main.js
+
+; stylesheets[all][] = css/main.css

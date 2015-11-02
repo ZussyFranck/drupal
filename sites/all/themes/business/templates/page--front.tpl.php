@@ -65,8 +65,8 @@
  */
 ?>
 
-<div id="wrap">
 
+<div id="wrap">
   <header id="header" class="clearfix" role="banner">
 
     <div>
@@ -93,7 +93,9 @@
       </div>
     </nav><!-- end main-menu -->
   </header>
+</div>
   
+  <div id="wrap">
   <?php print render($page['header']); ?>
   
     <?php if (theme_get_setting('slideshow_display','business')): ?>
@@ -124,7 +126,7 @@
             </div>
         </div>
       </div><!-- EOF: #banner -->
-	<?php endif; ?>  
+	<?php endif; ?>
 
 
   <?php print $messages; ?>
@@ -188,8 +190,10 @@
     </div>
     <div class="clear"></div>
   <?php endif; ?>
+  </div> 
   
   <!--END footer -->
+  <div id="wrap">
   <?php print render($page['footer']) ?>
   
   <?php if (theme_get_setting('footer_copyright') || theme_get_setting('footer_credits')): ?>
@@ -203,4 +207,5 @@
     <?php endif; ?>
   </div>
   <?php endif; ?>
-</div>
+  </div>
+
