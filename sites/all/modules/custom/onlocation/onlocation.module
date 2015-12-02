@@ -1,0 +1,4 @@
+<?php
+function onlocation_preprocess_page(&$vars) {
+}
+/************************************************/

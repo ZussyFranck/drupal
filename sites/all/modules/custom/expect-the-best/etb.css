@@ -1,0 +1,68 @@
+.page-admin-config-content-etb .etb-submit{
+	background-color:#ffffff;
+	border:5px solid #cccccc;
+	display:inline-block;
+	cursor:pointer;
+	color:#666666;
+	font-family:Arial;
+	font-size:12px;
+	font-weight:bold;
+	padding:15px 50px;
+	text-decoration:none;
+}
+.page-admin-config-content-etb .etb-submit:hover {
+	background-color:#bfa200;
+}
+.page-admin-config-content-etb .etb-submit:active {
+	position:relative;
+	top:1px;
+}
+
+.page-admin-config-content-etb .content {
+	display: flex;
+	flex-flow: column wrap;
+}
+
+.page-admin-config-content-etb #top-rated-form, #upcoming-form, #popular-form, #all-form {
+	flex:1;
+}
+
+.page-admin-config-content-etb #top-rated-form input[type=submit], #upcoming-form input[type=submit], #popular-form input[type=submit], #all-form input[type=submit] {
+	background-color:#ffffff!important;
+	border:5px solid #cccccc!important;
+	display:block!important;
+	cursor:pointer!important;
+	color:#666666!important;
+	font-family:Arial!important;
+	font-size:12px!important;
+	font-weight:bold!important;
+	padding:15px 50px!important;
+	text-decoration:none!important;
+	background: none!important;
+	border-radius: 0!important;
+	width: 180px;
+} 
+
+.page-admin-config-content-etb #top-rated-form input[type=submit]:hover, #upcoming-form input[type=submit]:hover, #popular-form input[type=submit]:hover {
+	background-color:#bfa200!important;
+	color: white!important;
+}
+
+.page-admin-config-content-etb #top-rated-form input[type=submit]:active, #upcoming-form input[type=submit]:active, #popular-form input[type=submit]:active, #all-form input[type=submit]:active{
+	outline: none!important;
+	text-shadow:none!important;
+}
+
+.page-admin-config-content-etb #top-rated-form input[type=submit]:focus, #upcoming-form input[type=submit]:focus, #popular-form input[type=submit]:focus, #all-form input[type=submit]:focus{
+	outline: none!important;
+	text-shadow:none!important;
+}
+
+.page-admin-config-content-etb #all-form input[type=submit]:hover {
+	background-color:black!important;
+	color: white!important;
+}
+
+.page-admin-config-content-etb .region-content {
+	position: relative;
+}

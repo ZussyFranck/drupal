@@ -1,0 +1,11 @@
+name = On Location
+
+description = rent movies
+
+version = 7.x
+
+core = 7.x
+
+package = DWEB
+
+script[] = js/main.js

@@ -1,0 +1,290 @@
+<?php
+/*drupal_add_css(drupal_get_path('module', 'Expect The Best') . 'style.css', array('group' => CSS_DEFAULT, 'every_page' => TRUE));*/
+
+
+function etb_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#etb':
+    return '<p>'.t('Go to Configure -> etb and select the category of films that you want to add/update').'</p>';
+    break;
+  }
+}
+
+
+/* function that delete and add movies from the different type (top rated, upcoming, popular)*/
+function delete_top_rated(){
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node')
+  ->entityCondition('bundle', 'movie')
+  ->fieldCondition('field_movie_type', 'tid', 18);
+
+  $result = $query->execute();
+  $nids = array_keys($result['node']);
+  $tabsize = count($nids);
+  $nodes = entity_load('node', $nids);
+
+  for ($i = 0; $i<$tabsize; $i++){
+    node_delete($nids[$i]);
+  }
+}
+
+function add_top_rated(){
+      $node_type = 'page';
+      $top_rated_source = file_get_contents('http://api.themoviedb.org/3/movie/top_rated?api_key=51b3407616db4fe78f36b0c9e7ea0366&language=fr');
+      $top_rated_data = json_decode($top_rated_source, true);
+      $tabsize = count($top_rated_data['results']);
+      //var_dump($json_data['results']);
+      //echo $tabsize;
+
+     for ($i = 0; $i<$tabsize; $i++)
+      {
+        $title = $top_rated_data['results'][$i]['title'];
+        $cover = $top_rated_data['results'][$i]['poster_path'];
+        $overview = $top_rated_data['results'][$i]['overview'];
+        $date = $top_rated_data['results'][$i]['release_date'];
+
+        // Create node
+        $node = new stdClass();
+        // Set some default values
+        $node->type = 'movie';
+        node_object_prepare($node);
+        // Add title
+        $node->title = $title;
+        // Add infos
+        $node->field_movie_synopsis[LANGUAGE_NONE][0]['value'] = $overview;
+        $node->field_movie_date[LANGUAGE_NONE][0]['value'] = $date;
+        $node->field_movie_type[LANGUAGE_NONE][0]['tid'] = 18;
+        //$node->field_movie_director[LANGUAGE_NONE][0]['tid'] = 18;
+        // Add image
+        $image_url = 'http://image.tmdb.org/t/p/w1000' . $cover;
+        $destination = 'C:\wamp\www\drupaltp\sites\default\files';
+        $file = system_retrieve_file($image_url, file_default_scheme() . '://top_rated/cover_' .'img'.'.jpg', TRUE);
+        $node->field_movie_cover[LANGUAGE_NONE][0] = (array)$file;
+
+        // // Save the node
+        node_save($node);
+        $node->field_movie_synopsis[LANGUAGE_NONE][0]['value'] = $overview;
+      }
+}
+
+function delete_upcoming(){
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node')
+  ->entityCondition('bundle', 'movie')
+  ->fieldCondition('field_movie_type', 'tid', 19);
+
+  $result = $query->execute();
+  $nids = array_keys($result['node']);
+  $tabsize = count($nids);
+  $nodes = entity_load('node', $nids);
+
+  for ($i = 0; $i<$tabsize; $i++){
+    node_delete($nids[$i]);
+  }
+}
+
+function add_upcoming(){
+      $node_type = 'page';
+      $upcoming_source = file_get_contents('http://api.themoviedb.org/3/movie/upcoming?api_key=51b3407616db4fe78f36b0c9e7ea0366&language=fr');
+      $upcoming_data = json_decode($upcoming_source, true);
+      $tabsize = count($upcoming_data['results']);
+      //var_dump($json_data['results']);
+      //echo $tabsize;
+
+     for ($i = 0; $i<$tabsize; $i++)
+      {
+        $title = $upcoming_data['results'][$i]['title'];
+        $cover = $upcoming_data['results'][$i]['poster_path'];
+        $overview = $upcoming_data['results'][$i]['overview'];
+        $date = $upcoming_data['results'][$i]['release_date'];
+
+        // Create node
+        $node = new stdClass();
+        // Set some default values
+        $node->type = 'movie';
+        node_object_prepare($node);
+        // Add title
+        $node->title = $title;
+        // Add infos
+        $node->field_movie_synopsis[LANGUAGE_NONE][0]['value'] = $overview;
+        $node->field_movie_date[LANGUAGE_NONE][0]['value'] = $date;
+        $node->field_movie_type[LANGUAGE_NONE][0]['tid'] = 19;
+        //$node->field_movie_director[LANGUAGE_NONE][0]['tid'] = 18;
+        // Add image
+        $image_url = 'http://image.tmdb.org/t/p/w1000' . $cover;
+        $file = system_retrieve_file($image_url, file_default_scheme() . '://upcoming/cover_' .'img'.'.jpg', TRUE);
+        $node->field_movie_cover[LANGUAGE_NONE][0] = (array)$file;
+
+        // // Save the node
+        node_save($node);
+        $node->field_movie_synopsis[LANGUAGE_NONE][0]['value'] = $overview;
+      }
+}
+
+function delete_popular(){
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node')
+  ->entityCondition('bundle', 'movie')
+  ->fieldCondition('field_movie_type', 'tid', 17);
+
+  $result = $query->execute();
+  $nids = array_keys($result['node']);
+  $tabsize = count($nids);
+  $nodes = entity_load('node', $nids);
+
+  for ($i = 0; $i<$tabsize; $i++){
+    node_delete($nids[$i]);
+  }
+}
+
+function add_popular(){
+      $node_type = 'page';
+      $popular_source = file_get_contents('http://api.themoviedb.org/3/movie/top_rated?api_key=51b3407616db4fe78f36b0c9e7ea0366&language=fr');
+      $popular_source_data = json_decode($popular_source, true);
+      $tabsize = count($popular_source_data['results']);
+      //var_dump($json_data['results']);
+      //echo $tabsize;
+
+     for ($i = 0; $i<$tabsize; $i++)
+      {
+        $title = $popular_source_data['results'][$i]['title'];
+        $cover = $popular_source_data['results'][$i]['poster_path'];
+        $overview = $popular_source_data['results'][$i]['overview'];
+        $date = $popular_source_data['results'][$i]['release_date'];
+
+        // Create node
+        $node = new stdClass();
+        // Set some default values
+        $node->type = 'movie';
+        node_object_prepare($node);
+        // Add title
+        $node->title = $title;
+        // Add infos
+        $node->field_movie_synopsis[LANGUAGE_NONE][0]['value'] = $overview;
+        $node->field_movie_date[LANGUAGE_NONE][0]['value'] = $date;
+        $node->field_movie_type[LANGUAGE_NONE][0]['tid'] = 17;
+        //$node->field_movie_director[LANGUAGE_NONE][0]['tid'] = 18;
+        // Add image
+        $image_url = 'http://image.tmdb.org/t/p/w1000' . $cover;
+        $file = system_retrieve_file($image_url, file_default_scheme() . '://popular/cover_' .'img'.'.jpg', TRUE);
+        $node->field_movie_cover[LANGUAGE_NONE][0] = (array)$file;
+
+        // // Save the node
+        node_save($node);
+        $node->field_movie_synopsis[LANGUAGE_NONE][0]['value'] = $overview;
+      }
+}
+/************************************************/
+
+
+/*hook menu*/
+function etb_menu() {
+  $items = array();
+  $items['admin/config/content/etb'] = array(
+    'title' => 'etb',
+    'description' => t("Add and update movie's informations on your website"),
+    'page callback' => 'etb_config_page',
+    'page arguments' => array('etb'),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  return $items;
+}
+/***********************/
+
+
+/* page that contain the buttons that allow user to update or add movies by type*/
+function etb_config_page(){
+    $build = array();
+    
+    $build[1][1] = drupal_get_form('top_rated_form');
+    $build[1][2] = drupal_get_form('upcoming_form');
+    $build[1][3] = drupal_get_form('popular_form');
+    $build[1][4] = drupal_get_form('all_form');
+
+    //$build[1][4] = '<p>'.t('Create and update movies content').'</p>';
+    //var_dump($build);
+    return $build[1];
+}
+/***********************/
+
+
+/*three form*/
+function top_rated_form($form, &$form_state){
+  $form = array();
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Top rated'),
+    '#weight' => 1,
+    '#class' => 'etb-submit',
+  );
+  return $form;
+}
+
+function upcoming_form($form, &$form_state){
+  $form = array();
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Upcoming'),
+    '#weight' => 1,
+    '#class' => 'etb-submit',
+  );
+  return $form;
+}
+
+function popular_form($form, &$form_state){
+  $form = array();
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Popular'),
+    '#weight' => 1,
+    '#class' => 'etb-submit',
+  );
+  return $form;
+}
+
+function all_form($form, &$form_state){
+  $form = array();
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('All'),
+    '#weight' => 1,
+    '#class' => 'etb-submit-all',
+  );
+  return $form;
+}
+/********************/
+
+
+/*hook form submit - where the functions to delete and add movies are called*/
+function top_rated_form_submit($form, &$form_state) {
+  /* - delete all old movies from the database */
+  delete_top_rated();
+  /* - add new movies to the database */
+  add_top_rated();
+  drupal_set_message(t('The best rated films were correctly added or update'));
+}
+
+function popular_form_submit($form, &$form_state) {
+  delete_popular();
+  add_popular();
+  drupal_set_message(t('The most popular films were correctly added or update'));
+}
+
+function upcoming_form_submit($form, &$form_state) {
+  delete_upcoming();
+  add_upcoming();
+  drupal_set_message(t('Upcoming films were correctly added or update'));
+}
+
+function all_form_submit($form, &$form_state) {
+  delete_top_rated();
+  add_top_rated();
+  delete_popular();
+  add_popular();    
+  delete_upcoming();
+  add_upcoming();
+  drupal_set_message(t('All the films were correctly added or update'));
+}
+
+/************************************************/
